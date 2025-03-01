@@ -69,7 +69,8 @@ function handleInput(event) {
     const rect = canvas.getBoundingClientRect();
     let x, y;
 
-    if (event.type === 'touchstart') {
+    // Handle touch or mouse based on event type
+    if (event.type === 'touchstart' && event.touches) {
         const touch = event.touches[0];
         x = touch.clientX - rect.left;
         y = touch.clientY - rect.top;
@@ -77,19 +78,4 @@ function handleInput(event) {
         x = event.clientX - rect.left;
         y = event.clientY - rect.top;
     } else {
-        return; // Ignore other events
-    }
-
-    if (x >= boundary.x && x <= boundary.x + boundary.width &&
-        y >= boundary.y && y <= boundary.y + boundary.height) {
-        target.x = x - canvas.width / 2;
-        target.y = y - canvas.height / 2;
-    }
-}
-
-// Add event listeners
-canvas.addEventListener('mousedown', handleInput);   // Desktop
-canvas.addEventListener('touchstart', handleInput);  // Mobile
-
-// Start the game
-gameLoop();
+        return; //
