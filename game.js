@@ -11,22 +11,19 @@ window.addEventListener('resize', resizeCanvas);
 
 // Game variables
 const boundary = { x: 50, y: 50, width: canvas.width - 100, height: canvas.height - 100 };
-const target = { x: 0, y: 0, width: 40, height: 40 }; // Larger for text
+const target = { x: 0, y: 0, width: 40, height: 40 };
 const crosshairSize = 30;
 const sensitivity = 0.05;
 
 // Animation loop
 function gameLoop() {
-    // Clear canvas
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw boundary frame (green)
     ctx.strokeStyle = 'green';
     ctx.lineWidth = 2;
     ctx.strokeRect(boundary.x, boundary.y, boundary.width, boundary.height);
 
-    // Draw target frame (white) with text
     const targetScreenX = canvas.width / 2 + target.x - target.width / 2;
     const targetScreenY = canvas.height / 2 + target.y - target.height / 2;
     ctx.strokeStyle = 'white';
@@ -38,7 +35,6 @@ function gameLoop() {
     ctx.fillText('target', targetScreenX + target.width / 2, targetScreenY + 20);
     ctx.fillText('object', targetScreenX + target.width / 2, targetScreenY + 32);
 
-    // Draw crosshair (green)
     ctx.strokeStyle = 'green';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -48,17 +44,15 @@ function gameLoop() {
     ctx.lineTo(canvas.width / 2, canvas.height / 2 + crosshairSize);
     ctx.stroke();
 
-    // Draw text centered above crosshair (60% gray)
     ctx.fillStyle = 'rgba(153, 153, 153, 1)';
     ctx.font = '16px Arial';
     ctx.textAlign = 'center';
     const textX = canvas.width / 2;
-    const textY = canvas.height / 2 - crosshairSize - 60; // Space above crosshair
+    const textY = canvas.height / 2 - crosshairSize - 60;
     ctx.fillText(`Target: (${Math.round(target.x)}, ${Math.round(target.y)})`, textX, textY);
     ctx.fillText(target.x > 0 ? 'Yaw Right' : target.x < 0 ? 'Yaw Left' : 'Yaw Locked', textX, textY + 20);
     ctx.fillText(target.y > 0 ? 'Pitch Down' : target.y < 0 ? 'Pitch Up' : 'Pitch Locked', textX, textY + 40);
 
-    // Linear interpolation to center
     if (target.x !== 0 || target.y !== 0) {
         target.x -= target.x * sensitivity;
         target.y -= target.y * sensitivity;
@@ -69,23 +63,33 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Handle touch/click input
+// Handle input (mouse or touch)
 function handleInput(event) {
     event.preventDefault();
     const rect = canvas.getBoundingClientRect();
-    const touch = event.type.includes('touch') ? event.touches[0] : event;
-    const clickX = touch.clientX - rect.left;
-    const clickY = touch.clientY - rect.top;
+    let x, y;
 
-    if (clickX >= boundary.x && clickX <= boundary.x + boundary.width &&
-        clickY >= boundary.y && clickY <= boundary.y + boundary.height) {
-        target.x = clickX - canvas.width / 2;
-        target.y = clickY - canvas.height / 2;
+    if (event.type === 'touchstart') {
+        const touch = event.touches[0];
+        x = touch.clientX - rect.left;
+        y = touch.clientY - rect.top;
+    } else if (event.type === 'mousedown') {
+        x = event.clientX - rect.left;
+        y = event.clientY - rect.top;
+    } else {
+        return; // Ignore other events
+    }
+
+    if (x >= boundary.x && x <= boundary.x + boundary.width &&
+        y >= boundary.y && y <= boundary.y + boundary.height) {
+        target.x = x - canvas.width / 2;
+        target.y = y - canvas.height / 2;
     }
 }
 
-canvas.addEventListener('click', handleInput);
-canvas.addEventListener('touchend', handleInput);
+// Add event listeners
+canvas.addEventListener('mousedown', handleInput);   // Desktop
+canvas.addEventListener('touchstart', handleInput);  // Mobile
 
 // Start the game
 gameLoop();
