@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tile Game</title>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; }
+        #game-container { position: relative; }
+        #lobby { text-align: center; color: white; }
+        #leaderboard { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div id="lobby">
+        <h1>Tile Game</h1>
+        <input type="text" id="player-name" placeholder="Enter your name" /><br>
+        <select id="character-select">
+            <option value="Bitcoin">Bitcoin</option>
+            <option value="Ethereum">Ethereum</option>
+            <option value="Ripple">Ripple</option>
+            <option value="Solana">Solana</option>
+            <option value="DOGE">DOGE</option>
+            <option value="Binance">Binance</option>
+            <option value="Cardano">Cardano</option>
+        </select><br>
+        <button onclick="startSinglePlayer()">Single Player</button>
+        <button onclick="startMultiplayer()">Multiplayer</button>
+        <div id="leaderboard">
+            <h2>Leaderboard</h2>
+            <ul id="leaderboard-list"></ul>
+        </div>
+    </div>
+    <div id="game-container" style="display: none;"></div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
