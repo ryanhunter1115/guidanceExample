@@ -14,6 +14,7 @@ const boundary = { x: 50, y: 50, width: canvas.width - 100, height: canvas.heigh
 const target = { x: 0, y: 0, width: 40, height: 40 };
 const crosshairSize = 30;
 const sensitivity = 0.05;
+let activeTouchId = null; // Track the first touch
 
 // Animation loop
 function gameLoop() {
@@ -63,19 +64,55 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Handle input (mouse or touch)
-function handleInput(event) {
+// Handle touch input
+function handleTouchStart(event) {
     event.preventDefault();
     const rect = canvas.getBoundingClientRect();
-    let x, y;
 
-    // Handle touch or mouse based on event type
-    if (event.type === 'touchstart' && event.touches) {
+    // If no active touch, set the first one
+    if (activeTouchId === null && event.touches.length > 0) {
         const touch = event.touches[0];
-        x = touch.clientX - rect.left;
-        y = touch.clientY - rect.top;
-    } else if (event.type === 'mousedown') {
-        x = event.clientX - rect.left;
-        y = event.clientY - rect.top;
-    } else {
-        return; //
+        activeTouchId = touch.identifier;
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        if (x >= boundary.x && x <= boundary.x + boundary.width &&
+            y >= boundary.y && y <= boundary.y + boundary.height) {
+            target.x = x - canvas.width / 2;
+            target.y = y - canvas.height / 2;
+        }
+    }
+}
+
+// Clear active touch on release
+function handleTouchEnd(event) {
+    event.preventDefault();
+    const touches = event.changedTouches;
+    for (let i = 0; i < touches.length; i++) {
+        if (touches[i].identifier === activeTouchId) {
+            activeTouchId = null;
+            break;
+        }
+    }
+}
+
+// Add event listeners
+canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+// Also support mouse for desktop
+canvas.addEventListener('mousedown', (event) => {
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    if (x >= boundary.x && x <= boundary.x + boundary.width &&
+        y >= boundary.y && y <= boundary.y + boundary.height) {
+        target.x = x - canvas.width / 2;
+        target.y = y - canvas.height / 2;
+    }
+});
+
+// Start the game
+gameLoop();
